@@ -70,6 +70,8 @@ export const useStore = create<SessionState>()(
     (set) => ({
       ...initialState,
 
+      // Note: messages use crypto.randomUUID() for unique IDs
+
       setConfig: (config) => set({ config }),
 
       setResume: (resume, text) => set({ resume, resumeText: text }),
@@ -153,6 +155,11 @@ export const useStore = create<SessionState>()(
     }),
     {
       name: 'ready-interview-session',
+      version: 2, // 版本号，升级会清除旧数据
+      migrate: () => {
+        // 迁移时清除旧数据，避免旧格式 ID 冲突
+        return { ...initialState };
+      },
     }
   )
 );
