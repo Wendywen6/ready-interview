@@ -185,11 +185,17 @@ export default function MapPage() {
 
       {/* 底部按钮 */}
       <div className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur-sm border-t border-gray-100 p-4">
-        <div className="max-w-lg mx-auto">
+        <div className="max-w-lg mx-auto flex gap-3">
           <button onClick={handleStartDiagnostic}
-            className="w-full py-3.5 rounded-xl bg-gray-900 text-white font-medium text-sm hover:bg-gray-800 transition-colors">
+            className="flex-1 py-3.5 rounded-xl bg-gray-900 text-white font-medium text-sm hover:bg-gray-800 transition-colors">
             开始 {diagnosticPlan?.totalMinutes || 10} 分钟快速诊断
           </button>
+          {stats.verified > 0 && (
+            <button onClick={() => { setPhase('summary'); router.push('/summary'); }}
+              className="px-4 py-3.5 rounded-xl border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors">
+              总结
+            </button>
+          )}
         </div>
       </div>
     </div>
