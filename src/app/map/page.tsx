@@ -146,16 +146,18 @@ export default function MapPage() {
         </h2>
         <div className="space-y-3">
           {sorted.map((c, i) => (
-            <div key={c.id} className="relative">
+            <div key={c.id}>
               <CompetencyCard competency={c} index={i} />
-              {/* 单项测试按钮 */}
+              {/* 单项测试按钮 — 放在卡片下方 */}
               {c.subCompetencies.some(s => s.status === 'unknown') && (
-                <button
-                  onClick={() => handleTestSingle(c.id)}
-                  className="absolute top-4 right-14 text-[10px] px-2 py-1 rounded-md border border-gray-200 text-gray-500 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all"
-                >
-                  测试 →
-                </button>
+                <div className="flex justify-end -mt-1 mb-1 pr-1">
+                  <button
+                    onClick={() => handleTestSingle(c.id)}
+                    className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all"
+                  >
+                    单项测试 →
+                  </button>
+                </div>
               )}
             </div>
           ))}
