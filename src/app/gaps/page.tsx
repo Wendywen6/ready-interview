@@ -42,8 +42,8 @@ export default function GapsPage() {
     <div className="min-h-screen pb-24">
       <StepIndicator current="gaps" />
       <div className="px-4 pt-4 pb-2">
-        <h1 className="text-xl font-bold text-gray-900">防御漏洞报告</h1>
-        <p className="mt-1 text-sm text-gray-500">以下是你简历中被击穿的攻击面</p>
+        <h1 className="text-xl font-bold text-gray-900">体检报告</h1>
+        <p className="mt-1 text-sm text-gray-500">以下是诊断中发现的薄弱项</p>
       </div>
 
       {/* Top Gaps */}

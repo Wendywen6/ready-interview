@@ -7,11 +7,11 @@
 import { useRouter } from 'next/navigation';
 
 const steps = [
-  { id: 'map', label: '攻击面', path: '/map' },
-  { id: 'diagnostic', label: '诊断', path: '/diagnostic' },
-  { id: 'gaps', label: '漏洞报告', path: '/gaps' },
+  { id: 'map', label: '风险地图', path: '/map' },
+  { id: 'diagnostic', label: '深度诊断', path: '/diagnostic' },
+  { id: 'gaps', label: '体检报告', path: '/gaps' },
   { id: 'repair', label: '修复', path: '/repair' },
-  { id: 'summary', label: '防御总结', path: '/summary' },
+  { id: 'summary', label: '体检总结', path: '/summary' },
 ] as const;
 
 type StepId = (typeof steps)[number]['id'];

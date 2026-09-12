@@ -86,7 +86,7 @@ export default function MapPage() {
           className="text-xs text-gray-400 hover:text-gray-600 mb-4 inline-block">
           ← 重新配置
         </button>
-        <h1 className="text-xl font-bold text-gray-900">简历攻击面分析</h1>
+        <h1 className="text-xl font-bold text-gray-900">你的面试风险地图</h1>
         <p className="mt-1 text-sm text-gray-500">
           面试还有 <span className="font-semibold text-gray-700">{config.daysUntilInterview} 天</span>
           {' · '}今天有 <span className="font-semibold text-gray-700">{config.availableMinutes} 分钟</span>
@@ -224,7 +224,7 @@ export default function MapPage() {
       {/* 完整准备地图 */}
       <div className="px-4">
         <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-          完整攻击面地图
+          完整检查项目
         </h2>
         <div className="space-y-3">
           {sorted.map((c, i) => (

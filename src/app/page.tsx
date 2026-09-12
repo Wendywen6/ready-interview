@@ -118,32 +118,32 @@ export default function SetupPage() {
       <div className="flex-shrink-0 pt-16 pb-8 px-4 text-center">
         <div className="animate-fade-in">
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Ready</h1>
-          <p className="mt-2 text-sm text-gray-400 font-medium">科研面试防御系统</p>
+          <p className="mt-2 text-sm text-gray-400 font-medium">保研面试深度体检</p>
         </div>
         <div className="mt-6 max-w-md mx-auto animate-slide-up">
           <p className="text-base text-gray-700 leading-relaxed">
-            不是帮你多练题，而是找出你的<span className="text-gray-900 font-semibold">简历攻击面</span>、
+            不是帮你多练题，而是帮你做一次<span className="text-gray-900 font-semibold">面试前的深度体检</span>——
           </p>
-          <p className="text-base text-gray-700 leading-relaxed">
-            验证<span className="text-gray-900 font-semibold">项目归属真实性</span>、模拟<span className="text-gray-900 font-semibold">连续追问压力</span>。
+          <p className="text-sm text-gray-500 mt-1 leading-relaxed">
+            扫描简历风险、验证项目归属、模拟压力追问。
           </p>
         </div>
         {/* 三个核心模块 */}
         <div className="mt-6 max-w-sm mx-auto grid grid-cols-3 gap-3 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-          <div className="bg-red-50 rounded-xl p-3 text-center">
-            <span className="text-lg">🎯</span>
-            <p className="text-[10px] font-semibold text-red-700 mt-1">Attack Surface</p>
-            <p className="text-[10px] text-red-500 mt-0.5">简历哪里最易被攻击</p>
+          <div className="bg-blue-50 rounded-xl p-3 text-center">
+            <span className="text-lg">🔬</span>
+            <p className="text-[10px] font-semibold text-blue-700 mt-1">风险扫描</p>
+            <p className="text-[10px] text-blue-500 mt-0.5">简历哪里最容易被追问</p>
           </div>
           <div className="bg-amber-50 rounded-xl p-3 text-center">
             <span className="text-lg">🔍</span>
-            <p className="text-[10px] font-semibold text-amber-700 mt-1">Ownership Audit</p>
-            <p className="text-[10px] text-amber-600 mt-0.5">项目真的是你做的吗</p>
+            <p className="text-[10px] font-semibold text-amber-700 mt-1">归属验证</p>
+            <p className="text-[10px] text-amber-600 mt-0.5">项目经历经得起追问吗</p>
           </div>
           <div className="bg-purple-50 rounded-xl p-3 text-center">
             <span className="text-lg">⚡</span>
-            <p className="text-[10px] font-semibold text-purple-700 mt-1">Stress Test</p>
-            <p className="text-[10px] text-purple-500 mt-0.5">连续追问你能扛住吗</p>
+            <p className="text-[10px] font-semibold text-purple-700 mt-1">压力测试</p>
+            <p className="text-[10px] text-purple-500 mt-0.5">面对质疑能否站得住</p>
           </div>
         </div>
       </div>

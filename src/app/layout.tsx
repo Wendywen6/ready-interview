@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Ready — 科研面试防御系统",
-  description: "找出简历攻击面、验证项目归属真实性、模拟连续追问压力测试。",
+  title: "Ready — 保研面试深度体检",
+  description: "扫描简历风险、验证项目归属、模拟压力追问，找出你真正需要准备的部分。",
 };
 
 export const viewport: Viewport = {
