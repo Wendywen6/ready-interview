@@ -84,5 +84,5 @@ Ready 把面试准备重新定义为"体检"而非"刷题"：
 
 ---
 
-- **线上地址**：https://ready-interview-delta.vercel.app/
+- **线上地址**：https://ready-interview-q6hsp2e8e-interview-ready.vercel.app/ （注：部署在 Vercel，国内访问需开 VPN）
 - **GitHub**：https://github.com/Wendywen6/ready-interview

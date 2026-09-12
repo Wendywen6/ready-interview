@@ -85,7 +85,7 @@ npm run dev
 
 ## 🔗 链接
 
-- **线上地址**: https://ready-interview-delta.vercel.app/
+- **线上地址**: https://ready-interview-q6hsp2e8e-interview-ready.vercel.app/ （国内访问需开 VPN）
 - **Product Memo**: [PRODUCT_MEMO.md](./PRODUCT_MEMO.md)
 
 ## 📄 License
