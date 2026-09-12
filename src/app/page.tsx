@@ -23,28 +23,27 @@ export default function SetupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // 处理文件上传 - 读取 PDF 文本
+  // 处理文件上传 - 客户端直接解析 PDF
   const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setFileName(file.name);
+    setError('');
 
     if (file.type === 'application/pdf') {
-      // 对于 PDF，发送到服务端解析
-      const formData = new FormData();
-      formData.append('file', file);
-
       try {
-        const res = await fetch('/api/parse-pdf', { method: 'POST', body: formData });
-        if (res.ok) {
-          const data = await res.json();
-          setResumeText(data.text);
+        // 客户端直接解析 PDF，不走服务器
+        const { extractTextFromPDF } = await import('@/lib/pdf-client');
+        const text = await extractTextFromPDF(file);
+        if (text.trim()) {
+          setResumeText(text);
         } else {
-          setError('PDF解析失败，请尝试手动粘贴简历内容');
+          setError('PDF 内容为空，请尝试手动粘贴简历内容');
         }
-      } catch {
-        setError('PDF解析失败，请尝试手动粘贴简历内容');
+      } catch (err) {
+        console.error('PDF parse error:', err);
+        setError('PDF解析失败，请直接粘贴简历文字内容到下方文本框');
       }
     } else {
       // 文本文件直接读取
