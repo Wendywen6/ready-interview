@@ -118,18 +118,33 @@ export default function SetupPage() {
       <div className="flex-shrink-0 pt-16 pb-8 px-4 text-center">
         <div className="animate-fade-in">
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Ready</h1>
-          <p className="mt-2 text-sm text-gray-400 font-medium">保研面试准备度分诊</p>
+          <p className="mt-2 text-sm text-gray-400 font-medium">科研面试防御系统</p>
         </div>
-        <div className="mt-8 max-w-md mx-auto animate-slide-up">
-          <p className="text-lg text-gray-700 leading-relaxed">
-            你不需要准备所有可能的问题。
+        <div className="mt-6 max-w-md mx-auto animate-slide-up">
+          <p className="text-base text-gray-700 leading-relaxed">
+            不是帮你多练题，而是找出你的<span className="text-gray-900 font-semibold">简历攻击面</span>、
           </p>
-          <p className="mt-1 text-base text-gray-500">
-            Ready 帮你找出<span className="text-gray-900 font-semibold">真正还没准备好</span>的部分。
+          <p className="text-base text-gray-700 leading-relaxed">
+            验证<span className="text-gray-900 font-semibold">项目归属真实性</span>、模拟<span className="text-gray-900 font-semibold">连续追问压力</span>。
           </p>
-          <p className="mt-3 text-xs text-gray-400 leading-relaxed">
-            不是让你多刷题，而是告诉你<span className="text-gray-600 font-medium">哪些可以不用准备了</span>。
-          </p>
+        </div>
+        {/* 三个核心模块 */}
+        <div className="mt-6 max-w-sm mx-auto grid grid-cols-3 gap-3 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+          <div className="bg-red-50 rounded-xl p-3 text-center">
+            <span className="text-lg">🎯</span>
+            <p className="text-[10px] font-semibold text-red-700 mt-1">Attack Surface</p>
+            <p className="text-[10px] text-red-500 mt-0.5">简历哪里最易被攻击</p>
+          </div>
+          <div className="bg-amber-50 rounded-xl p-3 text-center">
+            <span className="text-lg">🔍</span>
+            <p className="text-[10px] font-semibold text-amber-700 mt-1">Ownership Audit</p>
+            <p className="text-[10px] text-amber-600 mt-0.5">项目真的是你做的吗</p>
+          </div>
+          <div className="bg-purple-50 rounded-xl p-3 text-center">
+            <span className="text-lg">⚡</span>
+            <p className="text-[10px] font-semibold text-purple-700 mt-1">Stress Test</p>
+            <p className="text-[10px] text-purple-500 mt-0.5">连续追问你能扛住吗</p>
+          </div>
         </div>
       </div>
 

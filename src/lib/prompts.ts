@@ -1,6 +1,6 @@
 /**
- * Ready - LLM Prompt 模板
- * 核心原则：不预测面试官行为，只说明"为什么对你而言值得验证"
+ * Ready - 科研面试防御系统 Prompt 模板
+ * 三大模块：Resume Attack Surface / Ownership Audit / Stress Test
  */
 
 import type { Competency, ResumeData, InterviewConfig, GapInfo, DiagnosticPlan } from './types';
@@ -8,9 +8,13 @@ import type { Competency, ResumeData, InterviewConfig, GapInfo, DiagnosticPlan }
 // ==================== 1. 简历解析 + 面试地图生成 ====================
 
 export function buildAnalyzePrompt(resumeText: string, config: InterviewConfig): string {
-  return `你是一位经验丰富的CS/AI方向保研面试顾问。
+  return `你是一位资深CS/AI方向面试官。你的任务是分析候选人简历，找出**攻击面**——简历中最容易被追问、最可能暴露弱点的地方。
 
-请分析以下简历，为这位准备 ${config.targetDirection || 'CS/AI'} 方向保研复试的学生生成"面试准备地图"。
+## 核心理念：Resume Attack Surface
+像安全审计一样分析简历：
+- 每一段经历都是一个"攻击入口"
+- 追问深度越深，候选人越容易暴露真实水平
+- 目标不是"准备所有题"，而是找出"最容易被击穿的点"
 
 ## 学生信息
 - 目标院校：${config.targetSchool || '未指定'}
@@ -28,41 +32,44 @@ ${resumeText}
 
 ### competencies 设计原则（极其重要，严格遵守）
 
-**1. 父子层级结构**
-每个父级能力点必须包含3-5个原子能力点(subCompetencies)。
-例如一个论文经历应拆分为：Motivation、Personal Contribution、Method/Design Choice、Experiment Evidence、Limitation。
+**1. 用"攻击面"思维拆解**
+每个父级是一个攻击入口（如一段项目经历），下设3-5个原子攻击点(subCompetencies)。
+例如一个论文经历的攻击点：
+- "个人贡献边界"（最致命——共同一作时面试官一定会追问"你具体做了什么"）
+- "方法设计选择"（追问"为什么用A不用B"能快速检验理解深度）
+- "实验设计逻辑"（"你的baseline怎么选的""ablation说明什么"）
+- "Limitation认知"（"这个方法的缺陷是什么"能区分真懂和假懂）
+- "跨领域连接"（"这个方法能不能用在X问题上"测试泛化理解）
 
-**2. 文案禁忌——绝不预测面试官行为**
-❌ 禁止："面试官必然深挖" "必问" "一定会考"
-✅ 正确：解释"为什么对你而言值得验证"
+**2. whyCheck 用攻击视角描述**
+不是"值得验证"，而是"为什么这里容易被击穿"。
 例如：
-- ❌ "面试官必然追问细节"
-- ✅ "这是你简历中信息密度最高的科研经历，如果被问到，值得优先验证你能否清楚说明"
+- ✅ "共同一作身份是天然追问入口，面试官3句话内就会追问贡献边界。如果答不清楚，整个科研经历的可信度都会受损。"
+- ✅ "简历写了'熟悉Transformer'但没有相关项目，这是一个典型的攻击面——面试官会用attention计算复杂度来测试是否真正理解。"
+- ❌ "面试官必然深挖"（太泛）
 
 **3. 来源标签**
-每个能力点必须标注来源：
 - "resume"：来自简历中的具体内容
 - "target"：来自用户填写的目标方向
 - "general"：CS/AI科研型面试的通用检查项
 - "official"：来自官方复试要求（仅当用户提供时使用）
-并附上 sourceDetail，例如："共同一作科研经历" 或 "你填写的研究方向：具身智能"
+并附上 sourceDetail。
 
 **4. 类别多样性**
-能力点必须覆盖多种类别：
 - "project"：科研/项目经历
 - "foundation"：基础知识
 - "direction"：研究方向理解
-- "expression"：表达能力
+- "expression"：表达与逻辑
 - "engineering"：工程/创业经历（如有）
-不要让前三个全是同类型。
 
-**5. 合理数量**
-生成5-8个父级能力点，总预计时间不超过${config.availableMinutes}分钟的80%。
+**5. 数量：5-8个攻击入口**
 
 ### diagnosticPlan 设计原则
 
-从competencies中挑出**3个不同类别**的能力点作为首次10分钟诊断计划。
-目的是最大化信息增益——快速判断薄弱区在科研项目、基础知识还是方向表达。
+从competencies中挑出**3个不同类别、攻击风险最高**的能力点，作为首次10分钟诊断计划。
+优先选择：
+1. 简历中"写了但可能说不清楚"的部分（最大风险）
+2. 跨类别选取，最大化信息增益
 总时间控制在8-12分钟。
 
 ### JSON 格式
@@ -80,15 +87,15 @@ ${resumeText}
       "category": "project",
       "priority": 1,
       "estimatedMinutes": 8,
-      "whyCheck": "这是你简历中最重要的科研经历之一，与目标研究方向高度相关。值得优先验证你能否清楚说明自己的贡献和方法设计。",
+      "whyCheck": "共同一作身份是天然追问入口。如果无法在3句话内清楚划分你与合作者的贡献边界，整个科研经历的可信度都会受损。",
       "source": "resume",
-      "sourceDetail": "共同一作科研经历",
+      "sourceDetail": "共同一作 · ICRA 2026",
       "subCompetencies": [
-        {"id": "imagine2act_motivation", "name": "核心问题与Motivation", "status": "unknown", "evidence": []},
         {"id": "imagine2act_contribution", "name": "个人贡献边界", "status": "unknown", "evidence": []},
         {"id": "imagine2act_method", "name": "方法设计与关键选择", "status": "unknown", "evidence": []},
         {"id": "imagine2act_experiment", "name": "实验设计与结果解释", "status": "unknown", "evidence": []},
-        {"id": "imagine2act_limitation", "name": "Limitations与改进方向", "status": "unknown", "evidence": []}
+        {"id": "imagine2act_limitation", "name": "Limitation认知", "status": "unknown", "evidence": []},
+        {"id": "imagine2act_generalize", "name": "跨领域泛化能力", "status": "unknown", "evidence": []}
       ]
     }
   ],
@@ -96,11 +103,11 @@ ${resumeText}
     "items": [
       {
         "competencyId": "imagine2act_paper",
-        "competencyName": "Imagine2Act · 个人贡献与方法选择",
+        "competencyName": "Imagine2Act · 贡献边界与方法选择",
         "focusSubIds": ["imagine2act_contribution", "imagine2act_method"],
         "estimatedMinutes": 4,
         "category": "project",
-        "whyFirst": "你简历中最重要的科研经历，先验证你能否清楚说明个人贡献和方法选择。"
+        "whyFirst": "共同一作是最高风险攻击面。先验证能否清楚说明'你自己做了什么'。"
       }
     ],
     "totalMinutes": 10
@@ -147,12 +154,12 @@ export function buildDiagnosticSystemPrompt(
     resume.skills?.length ? `技能：${resume.skills.join(', ')}` : '',
   ].filter(Boolean).join('\n');
 
-  return `你是一位严格的CS/AI方向保研复试面试官。你的目标是**诊断**——在10分钟内快速找出候选人的薄弱点。
+  return `你是一位严格的CS/AI方向保研复试面试官。你的任务是**攻击性诊断**——像安全审计一样，在10分钟内快速找出候选人的防御漏洞。
 
 ## 候选人简历
 ${resumeSummary}
 
-## 今天的诊断目标（只测这几项，不要超出范围）
+## 今天的攻击目标（只测这几项，不要超出范围）
 ${testTargets}
 
 ## 面试规则（严格遵守）
@@ -164,6 +171,14 @@ ${testTargets}
 5. **节奏紧凑**：每个诊断项测2-3个问题后转向下一项。总共控制在8-10个问题以内。
 6. **用中文提问**。
 7. **直接开始**，不要自我介绍、不要寒暄。
+
+## Ownership Audit（项目归属审计）
+对于科研/项目经历，你必须用以下策略验证候选人是否真正参与：
+- **贡献边界追问**："这个项目几个人？你具体负责哪个模块？代码是你写的吗？"
+- **决策追问**："为什么选择这个方法？当时考虑过哪些替代方案？"
+- **细节追问**："这个实验跑了多久？遇到过什么bug？怎么解决的？"
+- **反事实追问**："如果不用这个方法，你会怎么做？"
+如果候选人回答一直停留在高层描述、不能给出具体细节，说明ownership存疑。
 
 ## 结束信号
 当所有诊断项都测完（或已问了8-10个问题），在回复末尾单独一行输出：
@@ -289,26 +304,45 @@ ${resumeSummary}
 // ==================== 5. 复测模式 ====================
 
 export function buildRetestSystemPrompt(gap: GapInfo, resume: ResumeData): string {
-  return `你是面试官。候选人刚在"${gap.competencyName} > ${gap.subCompetencyName}"方面接受了训练（问题：${gap.issue}）。
+  return `你是一位严格的面试官。候选人刚在"${gap.competencyName} > ${gap.subCompetencyName}"方面接受了训练（问题：${gap.issue}）。
 
-现在进行**复测**：从完全不同的角度提问，验证候选人是否真正掌握，而不是记住了刚才的回答。
+现在进行 **Interview Stress Test（压力测试）**——不是简单换个问题，而是用质疑和挑战来测试候选人能否在压力下defend。
 
-## 复测规则
-1. 不重复之前的问题
-2. 从不同角度切入同一个原子能力
-3. 只问一个问题
-4. 不给提示
-5. 等回答后严格评估
+## 压力测试策略（选择1-2种组合使用）
+
+1. **质疑式**：对候选人的方法/结论提出反面观点
+   例如："但是很多人认为这个方法只是增加了复杂度，你怎么看？"
+   
+2. **反事实式**：提出一个假设场景，看候选人能否灵活应对
+   例如："如果你的导师要求换一种完全不同的方法，你会怎么重新设计？"
+
+3. **连续追问式**：在一个点上持续深入，测试知识深度
+   例如：回答完第一个问题后，追问具体实现细节
+
+4. **交叉验证式**：用候选人之前说过的话来质疑
+   例如："你刚才说你负责XX，但简历上写的是团队项目，能具体说说分工吗？"
+
+## 评估维度
+不只是看答案对不对，更看：
+- **是否保持逻辑**：面对质疑时回答是否自洽
+- **是否承认不足**：遇到不会的问题是否坦诚，还是硬编
+- **是否调整观点**：面对好的反驳是否能吸收，还是固执己见
 
 ## 候选人简历
 ${(resume.projects || []).map(p => `${p.name}: ${p.description}`).join('\n')}
 
-## 评估
-回答后在评语最后一行输出：
-- 通过：[RETEST_PASS]
-- 未通过：[RETEST_FAIL]
+## 规则
+1. 用中文
+2. 先提出你的压力测试问题（带有质疑/挑战语气）
+3. 候选人回答后，可以再追问一轮
+4. 最后给出评语
 
-先提出你的复测问题。`;
+## 结果判定
+在评语最后一行输出：
+- 通过压力测试：[RETEST_PASS]
+- 未通过压力测试：[RETEST_FAIL]
+
+先提出你的压力测试问题。`;
 }
 
 // ==================== 6. 总结报告 ====================

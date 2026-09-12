@@ -162,7 +162,7 @@ export const useStore = create<SessionState>()(
     }),
     {
       name: 'ready-interview-session',
-      version: 3,
+      version: 4,
       migrate: () => ({ ...initialState }),
     }
   )

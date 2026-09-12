@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Ready — 保研面试准备度分诊",
-  description: "帮你找出真正还没准备好的部分，而不是让你练更多题。",
+  title: "Ready — 科研面试防御系统",
+  description: "找出简历攻击面、验证项目归属真实性、模拟连续追问压力测试。",
 };
 
 export const viewport: Viewport = {

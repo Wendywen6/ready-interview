@@ -131,7 +131,7 @@ export default function SummaryPage() {
       <StepIndicator current="summary" />
       {/* 头部 */}
       <div className="px-4 pt-6 pb-4 text-center">
-        <h1 className="text-xl font-bold text-gray-900">今天的准备结论</h1>
+        <h1 className="text-xl font-bold text-gray-900">防御状态总结</h1>
         <p className="mt-1 text-sm text-gray-400">
           面试还有 {config.daysUntilInterview} 天
         </p>

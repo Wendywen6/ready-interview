@@ -116,7 +116,7 @@ export default function RepairPage() {
   const handleStartRetest = () => {
     const systemMsg: ChatMessage = {
       id: crypto.randomUUID(), role: 'assistant',
-      content: '---\n\n🟡 **进入复测环节**\n\n你刚刚在提示下完成了回答，这还不能证明已经掌握。现在我会从一个不同的角度来验证。\n\n准备好了吗？',
+      content: '---\n\n⚡ **进入压力测试**\n\n修复完成，但这还不够。真实面试中你会面对质疑、挑战和连续追问。\n\n现在我会用压力测试来验证你能否在挑战下 defend 自己的观点。\n\n准备好了吗？',
       timestamp: Date.now(),
     };
     addRepairMessage(systemMsg);
@@ -137,16 +137,16 @@ export default function RepairPage() {
 
   const phaseTitle = {
     repair: `修复：${currentGap.subCompetencyName || currentGap.issue}`,
-    retest: '复测验证',
-    done: retestResult === 'pass' ? '✅ 通过复测！' : '需要继续训练',
+    retest: '⚡ 压力测试',
+    done: retestResult === 'pass' ? '✅ 通过压力测试！' : '未通过压力测试',
   }[currentPhase];
 
   return (
     <div className="h-screen flex flex-col">
       <StepIndicator current="repair" />
-      {currentPhase === 'retest' && !repairMessages.some(m => m.content.includes('进入复测环节')) && (
-        <div className="bg-yellow-50 px-4 py-2 text-center">
-          <p className="text-xs text-yellow-700">🟡 待复测 — 需要通过不同角度的问题才能标记为 Ready</p>
+      {currentPhase === 'retest' && !repairMessages.some(m => m.content.includes('压力测试')) && (
+        <div className="bg-purple-50 px-4 py-2 text-center">
+          <p className="text-xs text-purple-700">⚡ 压力测试 — 需要在质疑和挑战下 defend 才能标记为 Ready</p>
         </div>
       )}
 
@@ -164,14 +164,14 @@ export default function RepairPage() {
         <div className="max-w-lg mx-auto">
           {currentPhase === 'repair' && repairMessages.length >= 4 && !isLoading && (
             <button onClick={handleStartRetest}
-              className="w-full py-3 rounded-xl border-2 border-yellow-400 text-yellow-700 font-medium text-sm hover:bg-yellow-50 transition-colors">
-              🟡 进入复测环节
+              className="w-full py-3 rounded-xl border-2 border-purple-400 text-purple-700 font-medium text-sm hover:bg-purple-50 transition-colors">
+              ⚡ 进入压力测试
             </button>
           )}
           {currentPhase === 'retest' && repairMessages[repairMessages.length - 1]?.content.includes('准备好了吗') && !isLoading && (
             <button onClick={handleRetestGo}
-              className="w-full py-3 rounded-xl bg-gray-900 text-white font-medium text-sm hover:bg-gray-800 transition-colors">
-              开始复测 →
+              className="w-full py-3 rounded-xl bg-purple-700 text-white font-medium text-sm hover:bg-purple-800 transition-colors">
+              ⚡ 开始压力测试 →
             </button>
           )}
           {currentPhase === 'done' && (
