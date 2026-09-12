@@ -38,7 +38,7 @@ export default function DiagnosticPage() {
 
     // 创建一个空的 assistant 消息用于流式更新
     const assistantMsg: ChatMessage = {
-      id: `msg_${Date.now()}`,
+      id: crypto.randomUUID(),
       role: 'assistant',
       content: '',
       timestamp: Date.now(),
@@ -102,7 +102,7 @@ export default function DiagnosticPage() {
   // 处理用户发送消息
   const handleSend = useCallback((text: string) => {
     const userMsg: ChatMessage = {
-      id: `msg_${Date.now()}`,
+      id: crypto.randomUUID(),
       role: 'user',
       content: text,
       timestamp: Date.now(),

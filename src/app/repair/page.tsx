@@ -39,7 +39,7 @@ export default function RepairPage() {
     setIsLoading(true);
 
     const assistantMsg: ChatMessage = {
-      id: `msg_${Date.now()}`,
+      id: crypto.randomUUID(),
       role: 'assistant',
       content: '',
       timestamp: Date.now(),
@@ -122,7 +122,7 @@ export default function RepairPage() {
   // 处理用户发送
   const handleSend = useCallback((text: string) => {
     const userMsg: ChatMessage = {
-      id: `msg_${Date.now()}`,
+      id: crypto.randomUUID(),
       role: 'user',
       content: text,
       timestamp: Date.now(),
@@ -143,7 +143,7 @@ export default function RepairPage() {
   const handleStartRetest = () => {
     // 添加一个系统提示
     const systemMsg: ChatMessage = {
-      id: `msg_${Date.now()}`,
+      id: crypto.randomUUID(),
       role: 'assistant',
       content: '---\n\n🟡 **进入复测环节**\n\n你刚刚在提示下完成了回答，这还不能证明已经掌握。现在我会从一个不同的角度来验证。\n\n准备好了吗？',
       timestamp: Date.now(),
@@ -162,7 +162,7 @@ export default function RepairPage() {
     allMessages.push({ role: 'user', content: '准备好了，请开始复测。' });
 
     const userMsg: ChatMessage = {
-      id: `msg_${Date.now()}`,
+      id: crypto.randomUUID(),
       role: 'user',
       content: '准备好了，请开始复测。',
       timestamp: Date.now(),

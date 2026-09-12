@@ -2,24 +2,19 @@
 
 /**
  * 客户端 PDF 文本提取
- * 使用 pdfjs-dist 在浏览器端直接解析 PDF，避免服务端兼容问题
+ * 使用 pdfjs-dist 在浏览器端直接解析 PDF
  */
 
 export async function extractTextFromPDF(file: File): Promise<string> {
-  // 动态导入 pdfjs-dist（只在客户端加载）
   const pdfjsLib = await import('pdfjs-dist');
 
-  // 设置 worker 为内联模式（避免加载外部 worker 文件）
-  pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+  // 使用 CDN 加载 worker（最可靠的方式）
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
   const arrayBuffer = await file.arrayBuffer();
 
-  // 使用禁用 worker 的方式加载（更兼容）
   const pdf = await pdfjsLib.getDocument({
     data: arrayBuffer,
-    useWorkerFetch: false,
-    isEvalSupported: false,
-    useSystemFonts: true,
   }).promise;
 
   const textParts: string[] = [];
