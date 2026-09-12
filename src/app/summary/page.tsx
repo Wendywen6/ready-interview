@@ -5,15 +5,44 @@
  * 三层分离：必须修复 / 下一轮确认 / 不用再练
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore, countAllSubs } from '@/lib/store';
+import { StepIndicator } from '@/components/StepIndicator';
 
 export default function SummaryPage() {
   const router = useRouter();
   const { config, competencies, gaps } = useStore();
   const [advice, setAdvice] = useState('');
   const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    const weakSubs = competencies.flatMap(c =>
+      c.subCompetencies.filter(s => s.status === 'weak').map(s => `🔴 ${c.name} > ${s.name}`)
+    );
+    const readySubs = competencies.flatMap(c =>
+      c.subCompetencies.filter(s => s.status === 'ready').map(s => `🟢 ${c.name} > ${s.name}`)
+    );
+    const pendingSubs = competencies.flatMap(c =>
+      c.subCompetencies.filter(s => s.status === 'pending').map(s => `🟡 ${c.name} > ${s.name}`)
+    );
+
+    const text = [
+      `【Ready 准备度总结】`,
+      `面试还有 ${config?.daysUntilInterview} 天`,
+      '',
+      weakSubs.length > 0 ? `⚠️ 需要修复：\n${weakSubs.join('\n')}` : '',
+      pendingSubs.length > 0 ? `\n🟡 待复测：\n${pendingSubs.join('\n')}` : '',
+      readySubs.length > 0 ? `\n✅ 已排除风险：\n${readySubs.join('\n')}` : '',
+      advice ? `\n💡 建议：${advice}` : '',
+    ].filter(Boolean).join('\n');
+
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }, [competencies, config, advice]);
 
   useEffect(() => {
     if (!config || competencies.length === 0) router.push('/');
@@ -99,8 +128,9 @@ export default function SummaryPage() {
 
   return (
     <div className="min-h-screen pb-24">
+      <StepIndicator current="summary" />
       {/* 头部 */}
-      <div className="px-4 pt-10 pb-4 text-center">
+      <div className="px-4 pt-6 pb-4 text-center">
         <h1 className="text-xl font-bold text-gray-900">今天的准备结论</h1>
         <p className="mt-1 text-sm text-gray-400">
           面试还有 {config.daysUntilInterview} 天
@@ -248,14 +278,20 @@ export default function SummaryPage() {
 
       {/* 底部操作 */}
       <div className="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur-sm border-t border-gray-100 p-4">
-        <div className="max-w-lg mx-auto flex gap-3">
-          <button onClick={() => router.push('/map')}
-            className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors">
-            返回准备地图
-          </button>
-          <button onClick={() => { useStore.getState().reset(); router.push('/'); }}
-            className="flex-1 py-3 rounded-xl bg-gray-900 text-white font-medium text-sm hover:bg-gray-800 transition-colors">
-            重新开始
+        <div className="max-w-lg mx-auto space-y-2">
+          <div className="flex gap-3">
+            <button onClick={() => router.push('/map')}
+              className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors">
+              返回准备地图
+            </button>
+            <button onClick={() => { useStore.getState().reset(); router.push('/'); }}
+              className="flex-1 py-3 rounded-xl bg-gray-900 text-white font-medium text-sm hover:bg-gray-800 transition-colors">
+              重新开始
+            </button>
+          </div>
+          <button onClick={handleCopy}
+            className="w-full py-2.5 rounded-xl border border-gray-200 text-gray-500 text-xs font-medium hover:bg-gray-50 transition-colors">
+            {copied ? '✅ 已复制到剪贴板' : '📋 复制总结发给自己'}
           </button>
         </div>
       </div>

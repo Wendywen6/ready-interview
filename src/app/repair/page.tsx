@@ -8,6 +8,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import { ChatInterface } from '@/components/ChatInterface';
+import { StepIndicator } from '@/components/StepIndicator';
 import type { ChatMessage } from '@/lib/types';
 
 type RepairPhase = 'repair' | 'retest' | 'done';
@@ -142,6 +143,7 @@ export default function RepairPage() {
 
   return (
     <div className="h-screen flex flex-col">
+      <StepIndicator current="repair" />
       {currentPhase === 'retest' && !repairMessages.some(m => m.content.includes('进入复测环节')) && (
         <div className="bg-yellow-50 px-4 py-2 text-center">
           <p className="text-xs text-yellow-700">🟡 待复测 — 需要通过不同角度的问题才能标记为 Ready</p>

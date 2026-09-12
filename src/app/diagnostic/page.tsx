@@ -9,6 +9,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import { ChatInterface } from '@/components/ChatInterface';
+import { StepIndicator } from '@/components/StepIndicator';
 import type { ChatMessage } from '@/lib/types';
 
 export default function DiagnosticPage() {
@@ -141,8 +142,9 @@ export default function DiagnosticPage() {
 
   return (
     <div className="h-screen flex flex-col">
+      <StepIndicator current="diagnostic" />
       {/* 顶部返回按钮 */}
-      <div className="flex items-center gap-2 px-4 pt-3 pb-1 bg-white">
+      <div className="flex items-center gap-2 px-4 pt-1 pb-1 bg-white">
         <button onClick={() => router.push('/map')}
           className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
           ← 返回地图

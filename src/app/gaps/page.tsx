@@ -8,6 +8,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore, deriveParentStatus } from '@/lib/store';
+import { StepIndicator } from '@/components/StepIndicator';
 
 export default function GapsPage() {
   const router = useRouter();
@@ -39,7 +40,8 @@ export default function GapsPage() {
 
   return (
     <div className="min-h-screen pb-24">
-      <div className="px-4 pt-8 pb-2">
+      <StepIndicator current="gaps" />
+      <div className="px-4 pt-4 pb-2">
         <h1 className="text-xl font-bold text-gray-900">你现在最值得解决的问题</h1>
         <p className="mt-1 text-sm text-gray-500">基于刚才的诊断对话分析得出</p>
       </div>

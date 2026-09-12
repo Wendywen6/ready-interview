@@ -4,7 +4,7 @@
  * 首页 / Setup 页面
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
 
@@ -20,7 +20,28 @@ export default function SetupPage() {
   const [resumeText, setResumeText] = useState('');
   const [fileName, setFileName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingStage, setLoadingStage] = useState(0);
+  const loadingTimer = useRef<NodeJS.Timeout | null>(null);
   const [error, setError] = useState('');
+
+  const loadingTexts = [
+    '正在阅读你的简历...',
+    '正在分析科研与项目经历...',
+    '正在生成个性化检查项...',
+    '正在规划诊断计划...',
+  ];
+
+  useEffect(() => {
+    if (isLoading) {
+      setLoadingStage(0);
+      loadingTimer.current = setInterval(() => {
+        setLoadingStage(prev => Math.min(prev + 1, loadingTexts.length - 1));
+      }, 3000);
+    } else {
+      if (loadingTimer.current) clearInterval(loadingTimer.current);
+    }
+    return () => { if (loadingTimer.current) clearInterval(loadingTimer.current); };
+  }, [isLoading, loadingTexts.length]);
 
   const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -198,7 +219,7 @@ export default function SetupPage() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                正在分析你的简历...
+                {loadingTexts[loadingStage]}
               </span>
             ) : '开始分诊'}
           </button>

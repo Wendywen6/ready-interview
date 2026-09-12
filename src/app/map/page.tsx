@@ -9,6 +9,7 @@ import { useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore, countAllSubs } from '@/lib/store';
 import { CompetencyCard } from '@/components/CompetencyCard';
+import { StepIndicator } from '@/components/StepIndicator';
 import type { DiagnosticPlan } from '@/lib/types';
 
 const sourceLabels: Record<string, { text: string; className: string }> = {
@@ -74,8 +75,9 @@ export default function MapPage() {
 
   return (
     <div className="min-h-screen pb-24">
+      <StepIndicator current="map" />
       {/* 头部 */}
-      <div className="px-4 pt-8 pb-2">
+      <div className="px-4 pt-4 pb-2">
         <button onClick={() => {
           if (window.confirm('重新配置将清除所有诊断数据，确定吗？')) {
             useStore.getState().reset(); router.push('/');
@@ -90,6 +92,21 @@ export default function MapPage() {
           {' · '}今天有 <span className="font-semibold text-gray-700">{config.availableMinutes} 分钟</span>
         </p>
       </div>
+
+      {/* 诊断完成提示 banner */}
+      {diagnosticComplete && (stats.weak > 0 || stats.ready > 0) && (
+        <div className="mx-4 mt-3 mb-1 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 flex items-center gap-2">
+          <span className="text-sm">📊</span>
+          <p className="text-xs text-blue-700">
+            上轮诊断完成
+            {stats.weak > 0 && <span>，发现 <span className="font-bold">{stats.weak}</span> 个缺口</span>}
+            {stats.ready > 0 && <span>，排除 <span className="font-bold">{stats.ready}</span> 个风险</span>}
+            。
+            <button onClick={() => { setPhase('summary'); router.push('/summary'); }}
+              className="ml-1 underline font-medium hover:text-blue-900">查看总结 →</button>
+          </p>
+        </div>
+      )}
 
       {/* 核心指标：风险导向，不是进度条 */}
       <div className="px-4 mb-6 mt-4">
