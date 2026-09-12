@@ -2,7 +2,6 @@
 
 /**
  * 首页 / Setup 页面
- * 用户输入面试配置 + 上传简历
  */
 
 import { useState, useCallback } from 'react';
@@ -11,7 +10,7 @@ import { useStore } from '@/lib/store';
 
 export default function SetupPage() {
   const router = useRouter();
-  const { setConfig, setResume, setCompetencies, setPhase } = useStore();
+  const { setConfig, setResume, setCompetencies, setPhase, setDiagnosticPlan } = useStore();
 
   const [targetSchool, setTargetSchool] = useState('');
   const [targetDirection, setTargetDirection] = useState('');
@@ -23,36 +22,31 @@ export default function SetupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // 处理文件上传 - 客户端直接解析 PDF
   const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setFileName(file.name);
     setError('');
 
     if (file.type === 'application/pdf') {
       try {
-        // 客户端直接解析 PDF，不走服务器
         const { extractTextFromPDF } = await import('@/lib/pdf-client');
         const text = await extractTextFromPDF(file);
         if (text.trim()) {
           setResumeText(text);
         } else {
-          setError('PDF 内容为空，请尝试手动粘贴简历内容');
+          setError('PDF 内容为空，请直接粘贴简历文字内容');
         }
       } catch (err) {
         console.error('PDF parse error:', err);
         setError('PDF解析失败，请直接粘贴简历文字内容到下方文本框');
       }
     } else {
-      // 文本文件直接读取
       const text = await file.text();
       setResumeText(text);
     }
   }, []);
 
-  // 提交分析
   const handleSubmit = async () => {
     if (!resumeText.trim()) {
       setError('请上传简历或粘贴简历内容');
@@ -83,13 +77,11 @@ export default function SetupPage() {
       }
 
       const data = await res.json();
-
-      // 存储到全局状态
       setConfig(config);
       setResume(data.resume, resumeText);
       setCompetencies(data.competencies);
+      if (data.diagnosticPlan) setDiagnosticPlan(data.diagnosticPlan);
       setPhase('map');
-
       router.push('/map');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : '分析失败，请重试';
@@ -104,12 +96,9 @@ export default function SetupPage() {
       {/* Hero */}
       <div className="flex-shrink-0 pt-16 pb-8 px-4 text-center">
         <div className="animate-fade-in">
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-            Ready
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Ready</h1>
           <p className="mt-2 text-sm text-gray-400 font-medium">保研面试准备度分诊</p>
         </div>
-
         <div className="mt-8 max-w-md mx-auto animate-slide-up">
           <p className="text-lg text-gray-700 leading-relaxed">
             你不需要准备所有可能的问题。
@@ -123,44 +112,27 @@ export default function SetupPage() {
       {/* 配置表单 */}
       <div className="flex-1 max-w-lg mx-auto w-full px-4 pb-12">
         <div className="space-y-6 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-
-          {/* 面试信息 */}
           <div className="space-y-4">
-            <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-              你的面试
-            </h2>
-
+            <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">你的面试</h2>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1.5">目标院校</label>
-                <input
-                  type="text"
-                  value={targetSchool}
-                  onChange={(e) => setTargetSchool(e.target.value)}
+                <input type="text" value={targetSchool} onChange={(e) => setTargetSchool(e.target.value)}
                   placeholder="如：北大信科"
-                  className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent placeholder:text-gray-300"
-                />
+                  className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent placeholder:text-gray-300" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1.5">研究方向</label>
-                <input
-                  type="text"
-                  value={targetDirection}
-                  onChange={(e) => setTargetDirection(e.target.value)}
+                <input type="text" value={targetDirection} onChange={(e) => setTargetDirection(e.target.value)}
                   placeholder="如：具身智能"
-                  className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent placeholder:text-gray-300"
-                />
+                  className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent placeholder:text-gray-300" />
               </div>
             </div>
-
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1.5">距面试还有</label>
-                <select
-                  value={daysUntil}
-                  onChange={(e) => setDaysUntil(e.target.value)}
-                  className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 bg-white"
-                >
+                <select value={daysUntil} onChange={(e) => setDaysUntil(e.target.value)}
+                  className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 bg-white">
                   <option value="1">明天</option>
                   <option value="3">3天</option>
                   <option value="7">1周</option>
@@ -169,11 +141,8 @@ export default function SetupPage() {
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1.5">今天能练</label>
-                <select
-                  value={availableTime}
-                  onChange={(e) => setAvailableTime(e.target.value)}
-                  className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 bg-white"
-                >
+                <select value={availableTime} onChange={(e) => setAvailableTime(e.target.value)}
+                  className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 bg-white">
                   <option value="15">15 分钟</option>
                   <option value="30">30 分钟</option>
                   <option value="60">1 小时</option>
@@ -181,33 +150,19 @@ export default function SetupPage() {
                 </select>
               </div>
             </div>
-
             <div>
               <label className="block text-xs font-medium text-gray-500 mb-1.5">补充信息（可选）</label>
-              <input
-                type="text"
-                value={additionalInfo}
-                onChange={(e) => setAdditionalInfo(e.target.value)}
+              <input type="text" value={additionalInfo} onChange={(e) => setAdditionalInfo(e.target.value)}
                 placeholder="如：该学校要求英语面试、已知考查操作系统..."
-                className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent placeholder:text-gray-300"
-              />
+                className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent placeholder:text-gray-300" />
             </div>
           </div>
 
-          {/* 简历上传 */}
+          {/* 简历 */}
           <div className="space-y-3">
-            <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-              你的简历
-            </h2>
-
-            {/* 文件上传 */}
+            <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">你的简历</h2>
             <label className="block border-2 border-dashed border-gray-200 rounded-xl p-6 text-center cursor-pointer hover:border-gray-400 transition-colors">
-              <input
-                type="file"
-                accept=".pdf,.txt,.md"
-                onChange={handleFileUpload}
-                className="hidden"
-              />
+              <input type="file" accept=".pdf,.txt,.md" onChange={handleFileUpload} className="hidden" />
               {fileName ? (
                 <div>
                   <p className="text-sm font-medium text-gray-700">📄 {fileName}</p>
@@ -220,35 +175,20 @@ export default function SetupPage() {
                 </div>
               )}
             </label>
-
-            {/* 或者手动粘贴 */}
             <div className="relative">
               <div className="absolute inset-x-0 top-0 flex justify-center -mt-3">
                 <span className="bg-white px-3 text-xs text-gray-300">或直接粘贴</span>
               </div>
-              <textarea
-                value={resumeText}
-                onChange={(e) => setResumeText(e.target.value)}
-                placeholder="粘贴你的简历内容..."
-                rows={6}
-                className="w-full px-3 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent placeholder:text-gray-300 resize-none mt-2"
-              />
+              <textarea value={resumeText} onChange={(e) => setResumeText(e.target.value)}
+                placeholder="粘贴你的简历内容..." rows={6}
+                className="w-full px-3 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent placeholder:text-gray-300 resize-none mt-2" />
             </div>
           </div>
 
-          {/* 错误提示 */}
-          {error && (
-            <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-lg">
-              {error}
-            </div>
-          )}
+          {error && <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-lg">{error}</div>}
 
-          {/* 提交按钮 */}
-          <button
-            onClick={handleSubmit}
-            disabled={isLoading || !resumeText.trim()}
-            className="w-full py-3.5 rounded-xl bg-gray-900 text-white font-medium text-sm hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-          >
+          <button onClick={handleSubmit} disabled={isLoading || !resumeText.trim()}
+            className="w-full py-3.5 rounded-xl bg-gray-900 text-white font-medium text-sm hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
                 <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
@@ -257,14 +197,9 @@ export default function SetupPage() {
                 </svg>
                 正在分析你的简历...
               </span>
-            ) : (
-              '开始分诊'
-            )}
+            ) : '开始分诊'}
           </button>
-
-          <p className="text-xs text-gray-300 text-center">
-            我们不会存储你的简历数据
-          </p>
+          <p className="text-xs text-gray-300 text-center">我们不会存储你的简历数据</p>
         </div>
       </div>
     </div>

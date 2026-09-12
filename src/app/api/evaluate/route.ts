@@ -1,6 +1,6 @@
 /**
  * POST /api/evaluate
- * 评估诊断对话，提取证据并识别缺口
+ * 评估诊断对话，提取原子能力证据并识别缺口
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -14,13 +14,9 @@ export async function POST(req: NextRequest) {
     const { conversation, competencies, resume } = body;
 
     if (!conversation?.length || !competencies?.length) {
-      return NextResponse.json(
-        { error: '缺少对话记录或能力点数据' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: '缺少对话记录或能力点数据' }, { status: 400 });
     }
 
-    // 将 ChatMessage[] 转换为对话格式
     const convoForPrompt = conversation.map((m) => ({
       role: m.role,
       content: m.content,
@@ -30,16 +26,16 @@ export async function POST(req: NextRequest) {
 
     const result = await chatJSON<EvaluateResponse>(
       [
-        { role: 'system', content: '你是面试评估专家。请严格按照要求输出JSON格式。只输出JSON，不要任何其他文字。' },
+        { role: 'system', content: '你是面试评估专家。严格按要求输出JSON。只输出JSON，不要其他文字。' },
         { role: 'user', content: prompt },
       ],
       { temperature: 0.2, maxTokens: 4096 }
     );
 
-    // 确保返回数据的完整性
     const response: EvaluateResponse = {
-      competencyUpdates: (result.competencyUpdates || []).map((u) => ({
+      subCompetencyUpdates: (result.subCompetencyUpdates || []).map((u) => ({
         competencyId: u.competencyId,
+        subCompetencyId: u.subCompetencyId,
         status: u.status || 'unknown',
         evidence: (u.evidence || []).map((e) => ({
           ability: e.ability,
@@ -49,7 +45,9 @@ export async function POST(req: NextRequest) {
       })),
       topGaps: (result.topGaps || []).map((g) => ({
         competencyId: g.competencyId,
+        subCompetencyId: g.subCompetencyId || '',
         competencyName: g.competencyName,
+        subCompetencyName: g.subCompetencyName || '',
         severity: g.severity || 'important',
         issue: g.issue,
         userQuote: g.userQuote || '',
