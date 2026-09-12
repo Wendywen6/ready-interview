@@ -78,19 +78,38 @@ export default function MapPage() {
         </p>
       </div>
 
-      {/* 核心指标：X / Y 已验证 */}
+      {/* 核心指标：风险导向，不是进度条 */}
       <div className="px-4 mb-6 mt-4">
-        <div className="bg-gray-50 rounded-2xl p-5 text-center">
-          <div className="text-3xl font-bold text-gray-900">
-            {stats.verified} <span className="text-lg text-gray-400 font-normal">/ {stats.total}</span>
+        <div className="bg-gray-50 rounded-2xl p-5">
+          <div className="space-y-2">
+            {stats.ready > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-green-500">🟢</span>
+                <span className="text-sm text-gray-700">已排除 <span className="font-bold text-green-700">{stats.ready}</span> 个高优先级风险</span>
+              </div>
+            )}
+            {stats.weak > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-red-500">🔴</span>
+                <span className="text-sm text-gray-700">发现 <span className="font-bold text-red-700">{stats.weak}</span> 个明确缺口</span>
+              </div>
+            )}
+            {stats.pending > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-yellow-500">🟡</span>
+                <span className="text-sm text-gray-700"><span className="font-bold text-yellow-700">{stats.pending}</span> 个初测通过，待复测确认</span>
+              </div>
+            )}
+            {stats.unknown > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400">⚪</span>
+                <span className="text-sm text-gray-500">{stats.unknown} 个能力尚未检查</span>
+              </div>
+            )}
           </div>
-          <p className="mt-1 text-sm text-gray-500">个重点能力已验证</p>
-          <div className="flex justify-center gap-4 mt-3 text-xs">
-            <span className="text-gray-400">⚪ {stats.unknown} 未验证</span>
-            <span className="text-red-500">🔴 {stats.weak} 薄弱</span>
-            <span className="text-yellow-500">🟡 {stats.pending} 待复测</span>
-            <span className="text-green-500">🟢 {stats.ready} Ready</span>
-          </div>
+          {stats.verified === 0 && (
+            <p className="text-xs text-gray-400 mt-3">还没有开始诊断。先用 10 分钟找出最值得补的地方。</p>
+          )}
         </div>
       </div>
 
