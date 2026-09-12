@@ -8,10 +8,10 @@ import { useRouter } from 'next/navigation';
 
 const steps = [
   { id: 'map', label: '准备地图', path: '/map' },
-  { id: 'diagnostic', label: '诊断', path: '/diagnostic' },
-  { id: 'gaps', label: '缺口报告', path: '/gaps' },
-  { id: 'repair', label: '修复训练', path: '/repair' },
-  { id: 'summary', label: '总结', path: '/summary' },
+  { id: 'diagnostic', label: '快速诊断', path: '/diagnostic' },
+  { id: 'gaps', label: '问题分析', path: '/gaps' },
+  { id: 'repair', label: '修复', path: '/repair' },
+  { id: 'summary', label: '今日总结', path: '/summary' },
 ] as const;
 
 type StepId = (typeof steps)[number]['id'];
