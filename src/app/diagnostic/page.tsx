@@ -141,6 +141,13 @@ export default function DiagnosticPage() {
 
   return (
     <div className="h-screen flex flex-col">
+      {/* 顶部返回按钮 */}
+      <div className="flex items-center gap-2 px-4 pt-3 pb-1 bg-white">
+        <button onClick={() => router.push('/map')}
+          className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+          ← 返回地图
+        </button>
+      </div>
       <ChatInterface
         messages={diagnosticMessages}
         onSend={handleSend}

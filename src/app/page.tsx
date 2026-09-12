@@ -106,6 +106,9 @@ export default function SetupPage() {
           <p className="mt-1 text-base text-gray-500">
             Ready 帮你找出<span className="text-gray-900 font-semibold">真正还没准备好</span>的部分。
           </p>
+          <p className="mt-3 text-xs text-gray-400 leading-relaxed">
+            不是让你多刷题，而是告诉你<span className="text-gray-600 font-medium">哪些可以不用准备了</span>。
+          </p>
         </div>
       </div>
 

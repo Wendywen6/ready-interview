@@ -54,10 +54,23 @@ export default function GapsPage() {
               <div className="flex items-start gap-3">
                 <span className="text-2xl">🔴</span>
                 <div className="flex-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded">
                       {gap.severity === 'critical' ? '关键' : '重要'}
                     </span>
+                    {/* 错误归因标签 */}
+                    {gap.whyDangerous.includes('知识缺口') && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-100 text-purple-600">知识缺口</span>
+                    )}
+                    {gap.whyDangerous.includes('表达缺口') && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-600">表达缺口</span>
+                    )}
+                    {gap.whyDangerous.includes('证据不足') && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-yellow-100 text-yellow-700">证据不足</span>
+                    )}
+                    {gap.whyDangerous.includes('问题理解') && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-orange-100 text-orange-600">问题理解偏差</span>
+                    )}
                     <span className="text-xs text-gray-400">{gap.repairMinutes} min 修复</span>
                   </div>
 

@@ -20,7 +20,7 @@ const sourceLabels: Record<string, { text: string; className: string }> = {
 
 export default function MapPage() {
   const router = useRouter();
-  const { config, competencies, diagnosticPlan, setPhase } = useStore();
+  const { config, competencies, diagnosticPlan, diagnosticComplete, setPhase } = useStore();
 
   useEffect(() => {
     if (!config || competencies.length === 0) router.push('/');
@@ -30,6 +30,15 @@ export default function MapPage() {
 
   const sorted = [...competencies].sort((a, b) => a.priority - b.priority);
   const stats = countAllSubs(competencies);
+
+  // 诊断完成后，自动计算还未测的高优先级项目作为"下一轮计划"
+  const nextUntested = diagnosticComplete
+    ? competencies
+        .filter(c => c.subCompetencies.some(s => s.status === 'unknown'))
+        .sort((a, b) => a.priority - b.priority)
+        .slice(0, 3)
+    : null;
+  const hasUntested = stats.unknown > 0;
 
   const handleStartDiagnostic = () => {
     setPhase('diagnostic');
@@ -67,7 +76,11 @@ export default function MapPage() {
     <div className="min-h-screen pb-24">
       {/* 头部 */}
       <div className="px-4 pt-8 pb-2">
-        <button onClick={() => { useStore.getState().reset(); router.push('/'); }}
+        <button onClick={() => {
+          if (window.confirm('重新配置将清除所有诊断数据，确定吗？')) {
+            useStore.getState().reset(); router.push('/');
+          }
+        }}
           className="text-xs text-gray-400 hover:text-gray-600 mb-4 inline-block">
           ← 重新配置
         </button>
@@ -113,8 +126,41 @@ export default function MapPage() {
         </div>
       </div>
 
-      {/* 10分钟诊断计划 */}
-      {diagnosticPlan && diagnosticPlan.items.length > 0 && (
+      {/* 诊断计划 / 下一轮建议 */}
+      {diagnosticComplete && nextUntested && nextUntested.length > 0 ? (
+        <div className="px-4 mb-6">
+          <div className="bg-white border border-blue-200 rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-gray-900">
+              📋 下一轮建议检查
+            </h2>
+            <p className="text-xs text-gray-400 mt-1">
+              上轮诊断已完成。以下是还未检查的高优先级项目。
+            </p>
+            <div className="mt-4 space-y-3">
+              {nextUntested.map((comp, i) => {
+                const unknownCount = comp.subCompetencies.filter(s => s.status === 'unknown').length;
+                const source = sourceLabels[comp.source] || sourceLabels.general;
+                return (
+                  <div key={comp.id} className="flex items-start gap-3">
+                    <span className="text-xs font-bold text-gray-300 mt-0.5 w-5">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-gray-800">{comp.name}</span>
+                        <span className="text-xs text-gray-400">{unknownCount} 项未测</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded ${source.className}`}>{source.text}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      ) : diagnosticPlan && diagnosticPlan.items.length > 0 && !diagnosticComplete ? (
         <div className="px-4 mb-6">
           <div className="bg-white border border-gray-200 rounded-xl p-5">
             <h2 className="text-sm font-semibold text-gray-900">
@@ -156,7 +202,7 @@ export default function MapPage() {
             </div>
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* 完整准备地图 */}
       <div className="px-4">
@@ -188,7 +234,7 @@ export default function MapPage() {
         <div className="max-w-lg mx-auto flex gap-3">
           <button onClick={handleStartDiagnostic}
             className="flex-1 py-3.5 rounded-xl bg-gray-900 text-white font-medium text-sm hover:bg-gray-800 transition-colors">
-            开始 {diagnosticPlan?.totalMinutes || 10} 分钟快速诊断
+            {diagnosticComplete && hasUntested ? '继续诊断未测项目' : `开始 ${diagnosticPlan?.totalMinutes || 10} 分钟快速诊断`}
           </button>
           {stats.verified > 0 && (
             <button onClick={() => { setPhase('summary'); router.push('/summary'); }}
