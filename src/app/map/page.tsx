@@ -5,10 +5,11 @@
  * 核心改动：X/Y已验证指标 + 10分钟诊断计划 + 父子层级展示 + 来源标签
  */
 
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore, countAllSubs } from '@/lib/store';
 import { CompetencyCard } from '@/components/CompetencyCard';
+import type { DiagnosticPlan } from '@/lib/types';
 
 const sourceLabels: Record<string, { text: string; className: string }> = {
   resume: { text: '来自简历', className: 'bg-blue-50 text-blue-600' },
@@ -34,6 +35,33 @@ export default function MapPage() {
     setPhase('diagnostic');
     router.push('/diagnostic');
   };
+
+  // 点击单个能力点，直接针对它开始诊断
+  const handleTestSingle = useCallback((competencyId: string) => {
+    const comp = competencies.find(c => c.id === competencyId);
+    if (!comp) return;
+
+    const singlePlan: DiagnosticPlan = {
+      items: [{
+        competencyId: comp.id,
+        competencyName: comp.name,
+        focusSubIds: comp.subCompetencies.map(s => s.id),
+        estimatedMinutes: comp.estimatedMinutes,
+        category: comp.category,
+        whyFirst: comp.whyCheck,
+      }],
+      totalMinutes: comp.estimatedMinutes,
+    };
+
+    // 更新诊断计划为单项，清空旧消息，然后跳转
+    const store = useStore.getState();
+    store.setDiagnosticPlan(singlePlan);
+    store.setDiagnosticComplete(false);
+    // 通过 set 清空消息（直接修改 zustand state）
+    useStore.setState({ diagnosticMessages: [] });
+    setPhase('diagnostic');
+    router.push('/diagnostic');
+  }, [competencies, setPhase, router]);
 
   return (
     <div className="min-h-screen pb-24">
@@ -118,7 +146,18 @@ export default function MapPage() {
         </h2>
         <div className="space-y-3">
           {sorted.map((c, i) => (
-            <CompetencyCard key={c.id} competency={c} index={i} />
+            <div key={c.id} className="relative">
+              <CompetencyCard competency={c} index={i} />
+              {/* 单项测试按钮 */}
+              {c.subCompetencies.some(s => s.status === 'unknown') && (
+                <button
+                  onClick={() => handleTestSingle(c.id)}
+                  className="absolute top-4 right-14 text-[10px] px-2 py-1 rounded-md border border-gray-200 text-gray-500 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all"
+                >
+                  测试 →
+                </button>
+              )}
+            </div>
           ))}
         </div>
       </div>

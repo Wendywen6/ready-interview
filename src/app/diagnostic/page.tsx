@@ -76,13 +76,18 @@ export default function DiagnosticPage() {
     }
   }, [resume, competencies, diagnosticPlan, addDiagnosticMessage, updateLastDiagnosticMessage]);
 
-  // 初始化
+  // 初始化：当消息为空时自动开始诊断
   useEffect(() => {
-    if (!resume || !competencies.length || hasInitialized.current) return;
-    if (diagnosticMessages.length > 0) return;
+    if (!resume || !competencies.length) return;
+    if (diagnosticMessages.length > 0) return; // 已有消息则不重新开始
+    if (hasInitialized.current) {
+      // 如果之前初始化过但消息被清空了（用户选了新的测试项），重置标记
+      hasInitialized.current = false;
+    }
     hasInitialized.current = true;
+    setDiagnosticDone(false);
     sendToAI([{ role: 'user', content: '我准备好了，请开始面试。' }]);
-  }, [resume, competencies, diagnosticMessages.length, sendToAI]);
+  }, [resume, competencies, diagnosticMessages.length, sendToAI, setDiagnosticComplete]);
 
   const handleSend = useCallback((text: string) => {
     const userMsg: ChatMessage = {
